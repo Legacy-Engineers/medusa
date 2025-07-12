@@ -1,4 +1,3 @@
-// src/store.rs
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
@@ -14,7 +13,6 @@ impl Store {
         }
     }
 
-    // CREATE/UPDATE - Set a key-value pair
     pub fn set(&self, key: &str, value: &str) -> Result<(), String> {
         match self.map.lock() {
             Ok(mut map) => {
@@ -25,7 +23,6 @@ impl Store {
         }
     }
 
-    // READ - Get a value by key
     pub fn get(&self, key: &str) -> Result<Option<String>, String> {
         match self.map.lock() {
             Ok(map) => Ok(map.get(key).cloned()),
@@ -33,7 +30,6 @@ impl Store {
         }
     }
 
-    // DELETE - Remove a key-value pair
     pub fn delete(&self, key: &str) -> Result<Option<String>, String> {
         match self.map.lock() {
             Ok(mut map) => Ok(map.remove(key)),
@@ -41,7 +37,6 @@ impl Store {
         }
     }
 
-    // LIST - Get all keys
     pub fn list_keys(&self) -> Result<Vec<String>, String> {
         match self.map.lock() {
             Ok(map) => Ok(map.keys().cloned().collect()),
@@ -49,7 +44,6 @@ impl Store {
         }
     }
 
-    // COUNT - Get number of entries
     pub fn count(&self) -> Result<usize, String> {
         match self.map.lock() {
             Ok(map) => Ok(map.len()),
@@ -57,7 +51,6 @@ impl Store {
         }
     }
 
-    // EXISTS - Check if key exists
     pub fn exists(&self, key: &str) -> Result<bool, String> {
         match self.map.lock() {
             Ok(map) => Ok(map.contains_key(key)),
@@ -65,7 +58,6 @@ impl Store {
         }
     }
 
-    // CLEAR - Remove all entries
     pub fn clear(&self) -> Result<(), String> {
         match self.map.lock() {
             Ok(mut map) => {

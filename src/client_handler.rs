@@ -1,4 +1,3 @@
-// src/client_handler.rs
 use crate::store::Store;
 use std::io::{BufRead, BufReader, Write};
 use std::net::TcpStream;
@@ -9,7 +8,6 @@ pub fn handle_client(stream: TcpStream, store: Store) {
     let read_stream = stream.try_clone().expect("Failed to clone stream");
     let mut write_stream = stream;
 
-    // Send welcome message with commands
     let welcome_msg = r#"Welcome to Medusa server!
 Commands:
   SET key value    - Store a key-value pair
@@ -51,7 +49,6 @@ Commands:
                     break;
                 }
 
-                // Check if client wants to quit
                 if message.to_lowercase() == "quit" || message.to_lowercase() == "exit" {
                     break;
                 }
@@ -79,7 +76,7 @@ fn process_command(command: &str, store: &Store) -> String {
                 return "ERROR: SET requires key and value (SET key value)\n".to_string();
             }
             let key = parts[1];
-            let value = parts[2..].join(" "); // Join remaining parts as value
+            let value = parts[2..].join(" ");
 
             match store.set(key, &value) {
                 Ok(_) => format!("OK: Set '{}' = '{}'\n", key, value),
