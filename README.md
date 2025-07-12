@@ -8,6 +8,7 @@
 ╚═╝     ╚═╝╚══════╝╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝
               ∿∿∿ ∿∿∿ ∿∿∿ ∿∿∿ ∿∿∿
 `
+
 **Medusa** is a simple, lightweight in-memory key-value store inspired by [Redis](https://redis.io), built entirely in **Rust**.
 
 This project is **not meant for production**, but rather as a personal learning experiment to better understand:
