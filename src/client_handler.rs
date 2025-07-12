@@ -91,7 +91,7 @@ fn process_command(command: &str, store: &Store) -> String {
             let key = parts[1];
 
             match store.get(key) {
-                Ok(Some(value)) => format!("OK: '{}' = '{}'\n", key, value),
+                Ok(Some(value)) => format!("OK: '{}' = {} \n", key, value),
                 Ok(None) => format!("NULL: Key '{}' not found\n", key),
                 Err(e) => format!("ERROR: Failed to get value: {}\n", e),
             }
