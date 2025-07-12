@@ -1,11 +1,10 @@
+mod client_handler;
+mod server;
 mod store;
-use store::Store;
+
+use server::start_server;
 
 fn main() {
-    let mut db = Store::new();
-    db.set("name", "Medusa");
-
-    if let Some(value) = db.get("name") {
-        println!("Got: {}", value);
-    }
+    println!("Starting Medusa server...");
+    start_server();
 }
