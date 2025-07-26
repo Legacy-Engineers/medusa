@@ -1,61 +1,149 @@
-# 🐍 Medusa
-`
+# ⚡ Medusa
+
+<div align="center">
+
+```
 ███╗   ███╗███████╗██████╗ ██╗   ██╗███████╗ █████╗
 ████╗ ████║██╔════╝██╔══██╗██║   ██║██╔════╝██╔══██╗
 ██╔████╔██║█████╗  ██║  ██║██║   ██║███████╗███████║
 ██║╚██╔╝██║██╔══╝  ██║  ██║██║   ██║╚════██║██╔══██║
 ██║ ╚═╝ ██║███████╗██████╔╝╚██████╔╝███████║██║  ██║
 ╚═╝     ╚═╝╚══════╝╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝
-              ∿∿∿ ∿∿∿ ∿∿∿ ∿∿∿ ∿∿∿
-`
+```
 
-**Medusa** is a simple, lightweight in-memory key-value store inspired by [Redis](https://redis.io), built entirely in **Rust**.
+_A lightning-fast in-memory key-value store built with Rust_ ⚡
 
-This project is **not meant for production**, but rather as a personal learning experiment to better understand:
+[![Rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-Experimental-orange?style=for-the-badge)]()
 
-- How low-level data storage works
-- TCP networking and client handling
-- Command parsing and response formatting
-- Systems programming using Rust
+</div>
 
-## 📚 Why "Medusa"?
+---
 
-Just like Redis is known for its speed and power, Medusa channels those traits on a much smaller and friendlier scale. The name is symbolic — it may not turn you to stone, but it might turn your brain toward systems design. 🧠⚙️
+## 🎯 About
 
-## 🎯 Goals
+**Medusa** is a lightweight, high-performance in-memory key-value store inspired by [Redis](https://redis.io), built entirely in **Rust**. This project serves as a learning experiment to explore systems programming concepts and database internals.
 
-Medusa is built for:
-- Exploring how databases like Redis work internally
-- Learning Rust in a hands-on way
-- Building something fun and functional, from scratch
+### 🧠 What You'll Learn
 
-## 🚫 Not a Real Redis Clone
+- **Low-level data storage** and memory management
+- **TCP networking** and concurrent client handling
+- **Command parsing** and response serialization
+- **Systems programming** with Rust's safety guarantees
+- **Database internals** and performance optimization
 
-This is **not** a full Redis implementation.
-You won't find clustering, persistence, or advanced data types (yet).
+## ⚡ Why "Medusa"?
 
-This is about **understanding**, not replicating.
+Just as the mythical Medusa possessed incredible power, this project channels that energy into a compact, efficient data store. While it won't turn you to stone, it might transform your understanding of how databases work under the hood! 🧠⚙️
 
-## 🛠️ Built With
+## 🎯 Project Goals
 
-- **Rust** – Safe and fast systems programming language
-- 🧪 Curiosity and patience
+<div align="center">
 
-## 💡 Inspiration
+|         🎓 **Learning**         |    ⚡ **Performance**     |    🛠️ **Hands-on**    |
+| :-----------------------------: | :-----------------------: | :-------------------: |
+|   Explore database internals    | Fast in-memory operations |  Build from scratch   |
+| Master Rust systems programming |  Efficient TCP handling   | Understand every line |
+| Study Redis-like architectures  | Minimal memory footprint  |    Learn by doing     |
 
-- [Redis source code](https://github.com/redis/redis)
-- [Build Your Own Redis in C](https://build-your-own.org/redis/)
-- [The Rust Book](https://doc.rust-lang.org/book/)
+</div>
 
-## 🚀 Getting Started
+## 🚫 What This Is NOT
 
-To run Medusa (after it's functional):
+> ⚠️ **Important**: This is **not** a production-ready Redis clone.
+
+**Missing Features:**
+
+- ❌ Clustering and replication
+- ❌ Persistence and snapshots
+- ❌ Advanced data types (sets, sorted sets, etc.)
+- ❌ Pub/sub messaging
+- ❌ Lua scripting
+
+**Focus:** Understanding core concepts, not feature completeness.
+
+## 🛠️ Tech Stack
+
+<div align="center">
+
+|                                       Technology                                       | Purpose                                                 |
+| :------------------------------------------------------------------------------------: | :------------------------------------------------------ |
+| ![Rust](https://img.shields.io/badge/Rust-000000?style=flat&logo=rust&logoColor=white) | **Systems Programming** - Memory safety and performance |
+|          ![TCP](https://img.shields.io/badge/TCP-Networking-blue?style=flat)           | **Network Layer** - Client-server communication         |
+|       ![Memory](https://img.shields.io/badge/Memory-Management-green?style=flat)       | **Data Storage** - In-memory key-value operations       |
+
+</div>
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- [Rust](https://www.rust-lang.org/tools/install) (latest stable)
+- A terminal and some curiosity! 🧠
+
+### Running Medusa
 
 ```bash
-# Run the server to open tcp connection
+# Clone and navigate to the project
+git clone <your-repo-url>
+cd medusa
+
+# Build and run the server
 cargo run
 
-# Use the client.rs
+# In another terminal, test with the client
 rustc client.rs
 ./client
 ```
+
+### Example Usage
+
+```bash
+# Server will be listening on localhost:6379
+# Use the client to interact with Medusa
+./client
+
+# Available commands (Redis-like):
+SET key value
+GET key
+DEL key
+EXISTS key
+```
+
+## 📚 Learning Resources
+
+<div align="center">
+
+|                         Resource                          | Description                                |
+| :-------------------------------------------------------: | :----------------------------------------- |
+|    [Redis Source Code](https://github.com/redis/redis)    | **The Original** - Study the master        |
+| [Build Your Own Redis](https://build-your-own.org/redis/) | **Step-by-step** - C implementation guide  |
+|     [The Rust Book](https://doc.rust-lang.org/book/)      | **Language Reference** - Essential reading |
+
+</div>
+
+## 🤝 Contributing
+
+This is a **learning project**, but contributions that improve code quality, documentation, or educational value are welcome!
+
+### Development Guidelines
+
+- 🧪 **Experiment freely** - This is for learning!
+- 📝 **Document your discoveries** - Share what you learn
+- 🐛 **Report issues** - Help improve the codebase
+- 💡 **Suggest improvements** - Better ways to teach concepts
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+**Built with ⚡ by curious minds for curious minds**
+
+_"The best way to learn is to build"_ 🚀
+
+</div>
