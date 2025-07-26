@@ -2,14 +2,33 @@ use std::io::{self, BufRead, BufReader, Read, Write};
 use std::net::TcpStream;
 use std::sync::mpsc;
 use std::thread;
+use std::time::Duration;
 
 fn main() -> io::Result<()> {
-    let mut stream = TcpStream::connect("127.0.0.1:2312")?;
-    println!("Connected to server");
+    println!("⚡ Medusa Client");
+    println!("Connecting to server at 127.0.0.1:2312...");
+
+    let mut stream = match TcpStream::connect("127.0.0.1:2312") {
+        Ok(stream) => {
+            println!("✅ Connected to Medusa server!");
+            stream
+        }
+        Err(e) => {
+            eprintln!("❌ Failed to connect to server: {}", e);
+            eprintln!("💡 Make sure the Medusa server is running with: cargo run");
+            return Err(e);
+        }
+    };
+
+    // Set socket timeouts
+    stream.set_read_timeout(Some(Duration::from_secs(30)))?;
+    stream.set_write_timeout(Some(Duration::from_secs(10)))?;
+    stream.set_nodelay(true)?;
 
     let read_stream = stream.try_clone()?;
     let (tx, rx) = mpsc::channel();
 
+    // Spawn reader thread
     thread::spawn(move || {
         let mut reader = BufReader::new(read_stream);
         let mut buffer = String::new();
@@ -17,13 +36,19 @@ fn main() -> io::Result<()> {
         loop {
             buffer.clear();
             match reader.read_line(&mut buffer) {
-                Ok(0) => break, // Connection closed
+                Ok(0) => {
+                    println!("\n🔌 Server disconnected");
+                    break;
+                }
                 Ok(_) => {
-                    print!("Server: {}", buffer);
+                    let response = buffer.trim();
+                    if !response.is_empty() {
+                        println!("📡 Server: {}", response);
+                    }
                     io::stdout().flush().unwrap();
                 }
                 Err(e) => {
-                    eprintln!("Error reading from server: {}", e);
+                    eprintln!("\n❌ Error reading from server: {}", e);
                     break;
                 }
             }
@@ -31,30 +56,83 @@ fn main() -> io::Result<()> {
         let _ = tx.send(());
     });
 
+    // Main input loop
     let stdin = io::stdin();
-    println!("Type messages (or 'quit' to exit):");
+    println!("\n🎯 Type commands (or 'help' for available commands, 'quit' to exit):");
+    println!("💡 Example: SET user:1 'John Doe' 3600");
 
     for line in stdin.lock().lines() {
         match line {
             Ok(input) => {
-                let message = format!("{}\n", input);
+                let trimmed = input.trim();
+                
+                if trimmed.is_empty() {
+                    continue;
+                }
+
+                // Handle special commands
+                match trimmed.to_lowercase().as_str() {
+                    "help" => {
+                        print_help();
+                        continue;
+                    }
+                    "quit" | "exit" => {
+                        println!("👋 Goodbye!");
+                        break;
+                    }
+                    "clear" => {
+                        print!("\x1B[2J\x1B[1;1H"); // Clear screen
+                        continue;
+                    }
+                    _ => {}
+                }
+
+                // Send command to server
+                let message = format!("{}\n", trimmed);
                 if let Err(e) = stream.write_all(message.as_bytes()) {
-                    eprintln!("Failed to send message: {}", e);
+                    eprintln!("❌ Failed to send message: {}", e);
                     break;
                 }
 
-                if input.trim() == "quit" || input.trim() == "exit" {
+                if trimmed.to_lowercase() == "quit" || trimmed.to_lowercase() == "exit" {
                     break;
                 }
             }
             Err(e) => {
-                eprintln!("Error reading input: {}", e);
+                eprintln!("❌ Error reading input: {}", e);
                 break;
             }
         }
     }
 
+    // Wait for reader thread to finish
     let _ = rx.recv();
-    println!("Disconnected from server");
+    println!("🔌 Disconnected from server");
     Ok(())
+}
+
+fn print_help() {
+    println!("\n📚 Available Commands:");
+    println!("  SET key value [TTL]     - Store key-value pair with optional TTL");
+    println!("  GET key                  - Retrieve value by key");
+    println!("  DELETE key               - Remove key-value pair");
+    println!("  EXISTS key               - Check if key exists");
+    println!("  TTL key                  - Get time-to-live for key");
+    println!("  EXPIRE key seconds       - Set expiration time for key");
+    println!("  LIST                     - List all keys");
+    println!("  KEYS pattern             - Find keys matching pattern");
+    println!("  COUNT                    - Get number of entries");
+    println!("  CLEAR/FLUSHALL           - Remove all entries");
+    println!("  INFO                     - Get server statistics");
+    println!("  PING                     - Server health check");
+    println!("  QUIT/EXIT                - Disconnect");
+    println!("  HELP                     - Show this help");
+    println!("  CLEAR                    - Clear screen");
+    
+    println!("\n💡 Examples:");
+    println!("  SET user:1 'John Doe' 3600    # Set with 1 hour TTL");
+    println!("  EXPIRE user:1 7200            # Set 2 hour expiration");
+    println!("  KEYS user:*                   # Find all user keys");
+    println!("  TTL user:1                    # Check remaining time");
+    println!();
 }
