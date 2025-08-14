@@ -248,8 +248,10 @@ export MEDUSA_HOST="127.0.0.1"
 export MEDUSA_PORT="2312"
 export MEDUSA_MAX_CONNECTIONS="100"
 export MEDUSA_TIMEOUT="30"
+export MEDUSA_ENABLE_TIMEOUTS="false"
 export MEDUSA_LOG_LEVEL="info"
 export MEDUSA_METRICS="false"
+export MEDUSA_CLIENT_TIMEOUTS="false"
 ```
 
 ### Server Configuration
@@ -258,7 +260,7 @@ The server supports various configuration options:
 
 - **Host/Port**: Customize server binding
 - **Max Connections**: Limit concurrent clients
-- **Timeouts**: Configure connection timeouts
+- **Timeouts**: Configure connection timeouts (disabled by default)
 - **Logging**: Adjust verbosity levels
 
 ## 📊 Performance

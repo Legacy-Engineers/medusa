@@ -1,4 +1,4 @@
-use crate::client_handler::handle_client;
+use crate::client_handler::handle_client_with_timeout;
 use crate::store::Store;
 use std::net::{TcpListener, TcpStream};
 use std::thread;
@@ -9,6 +9,7 @@ pub struct ServerConfig {
     pub port: u16,
     pub max_connections: usize,
     pub connection_timeout: Duration,
+    pub enable_timeouts: bool,
 }
 
 impl Default for ServerConfig {
@@ -18,6 +19,7 @@ impl Default for ServerConfig {
             port: 2312,
             max_connections: 100,
             connection_timeout: Duration::from_secs(30),
+            enable_timeouts: false,
         }
     }
 }
@@ -32,7 +34,10 @@ pub fn start_server_with_config(config: ServerConfig) {
     println!("⚡ Starting Medusa server...");
     println!("📍 Address: {}", address);
     println!("🔗 Max connections: {}", config.max_connections);
-    println!("⏱️  Connection timeout: {:?}", config.connection_timeout);
+    println!("⏱️  Timeouts: {}", if config.enable_timeouts { "Enabled" } else { "Disabled" });
+    if config.enable_timeouts {
+        println!("⏱️  Connection timeout: {:?}", config.connection_timeout);
+    }
     
     let listener = match TcpListener::bind(&address) {
         Ok(listener) => {
@@ -66,8 +71,10 @@ pub fn start_server_with_config(config: ServerConfig) {
                 }
 
                 // Set socket options for the client connection
-                if let Err(e) = configure_client_socket(&stream, config.connection_timeout) {
-                    eprintln!("⚠️  Warning: Could not configure client socket: {}", e);
+                if config.enable_timeouts {
+                    if let Err(e) = configure_client_socket(&stream, config.connection_timeout) {
+                        eprintln!("⚠️  Warning: Could not configure client socket: {}", e);
+                    }
                 }
 
                 let store_clone = store.clone();
@@ -79,7 +86,7 @@ pub fn start_server_with_config(config: ServerConfig) {
                 println!("🔌 New connection #{} from {}", connection_count, client_addr);
 
                 thread::spawn(move || {
-                    handle_client(stream, store_clone);
+                    handle_client_with_timeout(stream, store_clone, config.enable_timeouts, config.connection_timeout);
                     println!("🔌 Connection #{} from {} closed", connection_count, client_addr);
                 });
             }
@@ -116,6 +123,7 @@ mod tests {
         assert_eq!(config.port, 2312);
         assert_eq!(config.max_connections, 100);
         assert_eq!(config.connection_timeout, Duration::from_secs(30));
+        assert_eq!(config.enable_timeouts, false);
     }
 
     #[test]

@@ -7,6 +7,7 @@ pub struct Config {
     pub port: u16,
     pub max_connections: usize,
     pub connection_timeout: Duration,
+    pub enable_timeouts: bool,
     pub log_level: String,
     pub enable_metrics: bool,
 }
@@ -18,6 +19,7 @@ impl Default for Config {
             port: 2312,
             max_connections: 100,
             connection_timeout: Duration::from_secs(30),
+            enable_timeouts: false,
             log_level: "info".to_string(),
             enable_metrics: false,
         }
@@ -51,6 +53,10 @@ impl Config {
             }
         }
         
+        if let Ok(enable_timeouts) = env::var("MEDUSA_ENABLE_TIMEOUTS") {
+            config.enable_timeouts = enable_timeouts.to_lowercase() == "true";
+        }
+        
         if let Ok(log_level) = env::var("MEDUSA_LOG_LEVEL") {
             config.log_level = log_level;
         }
@@ -67,7 +73,10 @@ impl Config {
         println!("  📍 Host: {}", self.host);
         println!("  🔌 Port: {}", self.port);
         println!("  🔗 Max Connections: {}", self.max_connections);
-        println!("  ⏱️  Timeout: {:?}", self.connection_timeout);
+        println!("  ⏱️  Timeouts: {}", if self.enable_timeouts { "Enabled" } else { "Disabled" });
+        if self.enable_timeouts {
+            println!("  ⏱️  Timeout Duration: {:?}", self.connection_timeout);
+        }
         println!("  📊 Log Level: {}", self.log_level);
         println!("  📈 Metrics: {}", self.enable_metrics);
         println!();
@@ -85,6 +94,7 @@ mod tests {
         assert_eq!(config.port, 2312);
         assert_eq!(config.max_connections, 100);
         assert_eq!(config.connection_timeout, Duration::from_secs(30));
+        assert_eq!(config.enable_timeouts, false);
     }
     
     #[test]

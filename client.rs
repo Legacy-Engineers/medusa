@@ -20,9 +20,12 @@ fn main() -> io::Result<()> {
         }
     };
 
-    // Set socket timeouts
-    stream.set_read_timeout(Some(Duration::from_secs(30)))?;
-    stream.set_write_timeout(Some(Duration::from_secs(10)))?;
+    // Set socket timeouts (configurable)
+    let enable_timeouts = std::env::var("MEDUSA_CLIENT_TIMEOUTS").unwrap_or_else(|_| "false".to_string()) == "true";
+    if enable_timeouts {
+        stream.set_read_timeout(Some(Duration::from_secs(30)))?;
+        stream.set_write_timeout(Some(Duration::from_secs(10)))?;
+    }
     stream.set_nodelay(true)?;
 
     let read_stream = stream.try_clone()?;

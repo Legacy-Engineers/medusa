@@ -20,6 +20,7 @@ fn main() {
         port: config.port,
         max_connections: config.max_connections,
         connection_timeout: config.connection_timeout,
+        enable_timeouts: config.enable_timeouts,
     };
 
     // Start the server

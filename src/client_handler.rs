@@ -4,11 +4,17 @@ use std::net::TcpStream;
 use std::time::Duration;
 
 pub fn handle_client(stream: TcpStream, store: Store) {
+    handle_client_with_timeout(stream, store, false, Duration::from_secs(30))
+}
+
+pub fn handle_client_with_timeout(stream: TcpStream, store: Store, enable_timeouts: bool, timeout: Duration) {
     println!("New client connected: {}", stream.peer_addr().unwrap());
 
-    // Set socket timeout for better connection handling
-    if let Err(e) = stream.set_read_timeout(Some(Duration::from_secs(30))) {
-        eprintln!("Failed to set read timeout: {}", e);
+    // Set socket timeout for better connection handling (only if enabled)
+    if enable_timeouts {
+        if let Err(e) = stream.set_read_timeout(Some(timeout)) {
+            eprintln!("Failed to set read timeout: {}", e);
+        }
     }
 
     let read_stream = stream.try_clone().expect("Failed to clone stream");
