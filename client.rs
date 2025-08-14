@@ -129,10 +129,30 @@ fn print_help() {
     println!("  HELP                     - Show this help");
     println!("  CLEAR                    - Clear screen");
     
+    println!("\n🗂️  Hash Operations:");
+    println!("  HSET key field value     - Set hash field to value");
+    println!("  HGET key field           - Get hash field value");
+    println!("  HGETALL key              - Get all hash fields and values");
+    println!("  HDEL key field           - Delete hash field");
+    println!("  HEXISTS key field        - Check if hash field exists");
+    println!("  HLEN key                 - Get hash length");
+    
+    println!("\n📋 List Operations:");
+    println!("  LPUSH key value          - Push value to left of list");
+    println!("  RPUSH key value          - Push value to right of list");
+    println!("  LPOP key                 - Pop value from left of list");
+    println!("  RPOP key                 - Pop value from right of list");
+    println!("  LLEN key                 - Get list length");
+    println!("  LRANGE key start stop    - Get list range (supports negative indices)");
+    
     println!("\n💡 Examples:");
     println!("  SET user:1 'John Doe' 3600    # Set with 1 hour TTL");
     println!("  EXPIRE user:1 7200            # Set 2 hour expiration");
     println!("  KEYS user:*                   # Find all user keys");
     println!("  TTL user:1                    # Check remaining time");
+    println!("  HSET user:1 name 'John'       # Set hash field");
+    println!("  HGET user:1 name              # Get hash field");
+    println!("  LPUSH tasks 'task1'           # Push to list");
+    println!("  LRANGE tasks 0 -1             # Get all list items");
     println!();
 }

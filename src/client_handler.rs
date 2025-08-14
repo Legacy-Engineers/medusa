@@ -31,11 +31,31 @@ Commands:
   PING                         - Server health check
   QUIT/EXIT                    - Disconnect
 
+Hash Operations:
+  HSET key field value         - Set hash field to value
+  HGET key field               - Get hash field value
+  HGETALL key                  - Get all hash fields and values
+  HDEL key field               - Delete hash field
+  HEXISTS key field            - Check if hash field exists
+  HLEN key                     - Get hash length
+
+List Operations:
+  LPUSH key value              - Push value to left of list
+  RPUSH key value              - Push value to right of list
+  LPOP key                     - Pop value from left of list
+  RPOP key                     - Pop value from right of list
+  LLEN key                     - Get list length
+  LRANGE key start stop        - Get list range (supports negative indices)
+
 Examples:
   SET user:1 "John Doe" 3600    # Set with 1 hour TTL
   EXPIRE user:1 7200            # Set 2 hour expiration
   KEYS user:*                   # Find all user keys
   TTL user:1                    # Check remaining time
+  HSET user:1 name "John"       # Set hash field
+  HGET user:1 name             # Get hash field
+  LPUSH tasks "task1"          # Push to list
+  LRANGE tasks 0 -1            # Get all list items
 
 "#;
 
@@ -242,6 +262,193 @@ fn process_command(command: &str, store: &Store) -> String {
         "PING" => "PONG\n".to_string(),
 
         "QUIT" | "EXIT" => "OK: Goodbye!\n".to_string(),
+
+        // Hash operations
+        "HSET" => {
+            if parts.len() < 4 {
+                return "ERROR: HSET requires key, field, and value (HSET key field value)\n".to_string();
+            }
+            let key = parts[1];
+            let field = parts[2];
+            let value = parts[3..].join(" ");
+
+            match store.hset(key, field, &value) {
+                Ok(is_new) => {
+                    if is_new {
+                        format!("OK: Created new field '{}' in hash '{}'\n", field, key)
+                    } else {
+                        format!("OK: Updated field '{}' in hash '{}'\n", field, key)
+                    }
+                }
+                Err(e) => format!("ERROR: Failed to set hash field: {}\n", e),
+            }
+        }
+
+        "HGET" => {
+            if parts.len() < 3 {
+                return "ERROR: HGET requires key and field (HGET key field)\n".to_string();
+            }
+            let key = parts[1];
+            let field = parts[2];
+
+            match store.hget(key, field) {
+                Ok(Some(value)) => format!("OK: '{}:{}' = {}\n", key, field, value),
+                Ok(None) => format!("NULL: Field '{}' not found in hash '{}'\n", field, key),
+                Err(e) => format!("ERROR: Failed to get hash field: {}\n", e),
+            }
+        }
+
+        "HGETALL" => {
+            if parts.len() < 2 {
+                return "ERROR: HGETALL requires a key (HGETALL key)\n".to_string();
+            }
+            let key = parts[1];
+
+            match store.hgetall(key) {
+                Ok(fields) => {
+                    if fields.is_empty() {
+                        format!("OK: Hash '{}' is empty\n", key)
+                    } else {
+                        let field_list: Vec<String> = fields.iter()
+                            .map(|(k, v)| format!("{}:{}", k, v))
+                            .collect();
+                        format!("OK: Hash '{}' fields: {}\n", key, field_list.join(", "))
+                    }
+                }
+                Err(e) => format!("ERROR: Failed to get hash: {}\n", e),
+            }
+        }
+
+        "HDEL" => {
+            if parts.len() < 3 {
+                return "ERROR: HDEL requires key and field (HDEL key field)\n".to_string();
+            }
+            let key = parts[1];
+            let field = parts[2];
+
+            match store.hdel(key, field) {
+                Ok(true) => format!("OK: Deleted field '{}' from hash '{}'\n", field, key),
+                Ok(false) => format!("FALSE: Field '{}' not found in hash '{}'\n", field, key),
+                Err(e) => format!("ERROR: Failed to delete hash field: {}\n", e),
+            }
+        }
+
+        "HEXISTS" => {
+            if parts.len() < 3 {
+                return "ERROR: HEXISTS requires key and field (HEXISTS key field)\n".to_string();
+            }
+            let key = parts[1];
+            let field = parts[2];
+
+            match store.hexists(key, field) {
+                Ok(true) => format!("TRUE: Field '{}' exists in hash '{}'\n", field, key),
+                Ok(false) => format!("FALSE: Field '{}' does not exist in hash '{}'\n", field, key),
+                Err(e) => format!("ERROR: Failed to check hash field existence: {}\n", e),
+            }
+        }
+
+        "HLEN" => {
+            if parts.len() < 2 {
+                return "ERROR: HLEN requires a key (HLEN key)\n".to_string();
+            }
+            let key = parts[1];
+
+            match store.hlen(key) {
+                Ok(len) => format!("OK: Hash '{}' has {} fields\n", key, len),
+                Err(e) => format!("ERROR: Failed to get hash length: {}\n", e),
+            }
+        }
+
+        // List operations
+        "LPUSH" => {
+            if parts.len() < 3 {
+                return "ERROR: LPUSH requires key and value (LPUSH key value)\n".to_string();
+            }
+            let key = parts[1];
+            let value = parts[2..].join(" ");
+
+            match store.lpush(key, &value) {
+                Ok(len) => format!("OK: Pushed to left of list '{}', new length: {}\n", key, len),
+                Err(e) => format!("ERROR: Failed to push to list: {}\n", e),
+            }
+        }
+
+        "RPUSH" => {
+            if parts.len() < 3 {
+                return "ERROR: RPUSH requires key and value (RPUSH key value)\n".to_string();
+            }
+            let key = parts[1];
+            let value = parts[2..].join(" ");
+
+            match store.rpush(key, &value) {
+                Ok(len) => format!("OK: Pushed to right of list '{}', new length: {}\n", key, len),
+                Err(e) => format!("ERROR: Failed to push to list: {}\n", e),
+            }
+        }
+
+        "LPOP" => {
+            if parts.len() < 2 {
+                return "ERROR: LPOP requires a key (LPOP key)\n".to_string();
+            }
+            let key = parts[1];
+
+            match store.lpop(key) {
+                Ok(Some(value)) => format!("OK: Popped from left of list '{}': {}\n", key, value),
+                Ok(None) => format!("NULL: List '{}' is empty\n", key),
+                Err(e) => format!("ERROR: Failed to pop from list: {}\n", e),
+            }
+        }
+
+        "RPOP" => {
+            if parts.len() < 2 {
+                return "ERROR: RPOP requires a key (RPOP key)\n".to_string();
+            }
+            let key = parts[1];
+
+            match store.rpop(key) {
+                Ok(Some(value)) => format!("OK: Popped from right of list '{}': {}\n", key, value),
+                Ok(None) => format!("NULL: List '{}' is empty\n", key),
+                Err(e) => format!("ERROR: Failed to pop from list: {}\n", e),
+            }
+        }
+
+        "LLEN" => {
+            if parts.len() < 2 {
+                return "ERROR: LLEN requires a key (LLEN key)\n".to_string();
+            }
+            let key = parts[1];
+
+            match store.llen(key) {
+                Ok(len) => format!("OK: List '{}' has {} items\n", key, len),
+                Err(e) => format!("ERROR: Failed to get list length: {}\n", e),
+            }
+        }
+
+        "LRANGE" => {
+            if parts.len() < 4 {
+                return "ERROR: LRANGE requires key, start, and stop (LRANGE key start stop)\n".to_string();
+            }
+            let key = parts[1];
+            let start = match parts[2].parse::<i64>() {
+                Ok(s) => s,
+                Err(_) => return "ERROR: Invalid start index\n".to_string(),
+            };
+            let stop = match parts[3].parse::<i64>() {
+                Ok(s) => s,
+                Err(_) => return "ERROR: Invalid stop index\n".to_string(),
+            };
+
+            match store.lrange(key, start, stop) {
+                Ok(items) => {
+                    if items.is_empty() {
+                        format!("OK: No items in range [{}, {}] for list '{}'\n", start, stop, key)
+                    } else {
+                        format!("OK: List '{}' range [{}, {}]: {}\n", key, start, stop, items.join(", "))
+                    }
+                }
+                Err(e) => format!("ERROR: Failed to get list range: {}\n", e),
+            }
+        }
 
         _ => {
             format!("ERROR: Unknown command '{}'\n", parts[0])

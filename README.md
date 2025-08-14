@@ -81,6 +81,19 @@ Just as the mythical Medusa possessed incredible power, this project channels th
 - Advanced pattern matching capabilities
 - Efficient key filtering
 
+### 🗂️ **Hash Data Type**
+
+- Store field-value pairs within a key
+- Operations: HSET, HGET, HGETALL, HDEL, HEXISTS, HLEN
+- Perfect for storing object-like data structures
+
+### 📋 **List Data Type**
+
+- Ordered collections of strings
+- Operations: LPUSH, RPUSH, LPOP, RPOP, LLEN, LRANGE
+- Support for negative indices in range operations
+- Ideal for queues, stacks, and ordered data
+
 ### ⚙️ **Configuration System**
 
 - Environment variable support
@@ -174,6 +187,28 @@ TTL key                      # Get time-to-live for key
 EXPIRE key seconds           # Set expiration time for key
 ```
 
+### 🗂️ **Hash Operations**
+
+```bash
+HSET key field value         # Set hash field to value
+HGET key field               # Get hash field value
+HGETALL key                  # Get all hash fields and values
+HDEL key field               # Delete hash field
+HEXISTS key field            # Check if hash field exists
+HLEN key                     # Get hash length
+```
+
+### 📋 **List Operations**
+
+```bash
+LPUSH key value              # Push value to left of list
+RPUSH key value              # Push value to right of list
+LPOP key                     # Pop value from left of list
+RPOP key                     # Pop value from right of list
+LLEN key                     # Get list length
+LRANGE key start stop        # Get list range (supports negative indices)
+```
+
 ### 🔍 **Query Operations**
 
 ```bash
@@ -198,6 +233,10 @@ SET user:1 "John Doe" 3600    # Set with 1 hour TTL
 EXPIRE user:1 7200            # Set 2 hour expiration
 KEYS user:*                   # Find all user keys
 TTL user:1                    # Check remaining time
+HSET user:1 name "John"       # Set hash field
+HGET user:1 name             # Get hash field
+LPUSH tasks "task1"          # Push to list
+LRANGE tasks 0 -1            # Get all list items
 ```
 
 ## ⚙️ Configuration
