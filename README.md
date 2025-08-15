@@ -136,17 +136,15 @@ Just as the mythical Medusa possessed incredible power, this project channels th
 
 ```bash
 # Clone and navigate to the project
-git clone <your-repo-url>
+git clone https://github.com/Legacy-Engineers/medusa.git
 cd medusa
 
 # Build the project
 cargo build --release
 
 # Run the server
-cargo run --release
-
-# Or run the optimized binary
-./target/release/medusa
+cargo run --bin medusa # to run the server
+cargo run --bin medusa-client # to run the client
 ```
 
 ### Using the Client

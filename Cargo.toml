@@ -2,10 +2,10 @@
 name = "medusa"
 version = "0.1.0"
 edition = "2021"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Dawda Borje Kujabi <dawdaborjekujabi@gmail.com>"]
 description = "A lightning-fast in-memory key-value store built with Rust for learning and experimentation"
 license = "MIT"
-repository = "https://github.com/your-username/medusa"
+repository = "https://github.com/Legacy-Engineers/medusa"
 keywords = ["redis", "key-value", "database", "learning", "rust"]
 categories = ["database", "command-line-utilities"]
 
