@@ -1,4 +1,4 @@
-# ⚡ Medusa
+# Medusa
 
 <div align="center">
 

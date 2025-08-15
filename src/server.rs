@@ -24,10 +24,6 @@ impl Default for ServerConfig {
     }
 }
 
-pub fn start_server() {
-    start_server_with_config(ServerConfig::default())
-}
-
 pub fn start_server_with_config(config: ServerConfig) {
     let address = format!("{}:{}", config.host, config.port);
     

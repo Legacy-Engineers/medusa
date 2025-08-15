@@ -3,9 +3,7 @@ use std::io::{BufRead, BufReader, Write};
 use std::net::TcpStream;
 use std::time::Duration;
 
-pub fn handle_client(stream: TcpStream, store: Store) {
-    handle_client_with_timeout(stream, store, false, Duration::from_secs(30))
-}
+
 
 pub fn handle_client_with_timeout(stream: TcpStream, store: Store, enable_timeouts: bool, timeout: Duration) {
     println!("New client connected: {}", stream.peer_addr().unwrap());
@@ -20,7 +18,7 @@ pub fn handle_client_with_timeout(stream: TcpStream, store: Store, enable_timeou
     let read_stream = stream.try_clone().expect("Failed to clone stream");
     let mut write_stream = stream;
 
-    let welcome_msg = r#"⚡ Welcome to Medusa server!
+    let welcome_msg = r#"Welcome to Medusa server!
 Commands:
   SET key value [TTL seconds]  - Store a key-value pair with optional TTL
   GET key                      - Retrieve value by key
