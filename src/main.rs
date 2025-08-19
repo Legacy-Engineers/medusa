@@ -10,11 +10,9 @@ fn main() {
     println!("⚡ Medusa - Lightning Fast Key-Value Store");
     println!("Built with Rust for learning and experimentation\n");
 
-    // Load configuration from environment
     let config = Config::from_env();
     config.display();
 
-    // Convert to server config
     let server_config = ServerConfig {
         host: config.host,
         port: config.port,

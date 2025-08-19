@@ -46,7 +46,6 @@ pub fn start_server_with_config(config: ServerConfig) {
         }
     };
 
-    // Set socket options for better performance
     if let Err(e) = listener.set_nonblocking(false) {
         eprintln!("⚠️  Warning: Could not set non-blocking mode: {}", e);
     }
@@ -66,7 +65,6 @@ pub fn start_server_with_config(config: ServerConfig) {
                     continue;
                 }
 
-                // Set socket options for the client connection
                 if config.enable_timeouts {
                     if let Err(e) = configure_client_socket(&stream, config.connection_timeout) {
                         eprintln!("⚠️  Warning: Could not configure client socket: {}", e);
@@ -94,15 +92,9 @@ pub fn start_server_with_config(config: ServerConfig) {
 }
 
 fn configure_client_socket(stream: &TcpStream, timeout: Duration) -> std::io::Result<()> {
-    // Set read timeout
     stream.set_read_timeout(Some(timeout))?;
-    
-    // Set write timeout
     stream.set_write_timeout(Some(timeout))?;
-    
-    // Set TCP nodelay for better performance
     stream.set_nodelay(true)?;
-    
     Ok(())
 }
 
