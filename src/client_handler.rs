@@ -6,67 +6,29 @@ use std::time::Duration;
 
 
 pub fn handle_client_with_timeout(stream: TcpStream, store: Store, enable_timeouts: bool, timeout: Duration) {
-    println!("New client connected: {}", stream.peer_addr().unwrap());
+    let client_addr = stream.peer_addr().map(|addr| addr.to_string()).unwrap_or_else(|_| "unknown".to_string());
+    println!("New client connected: {}", client_addr);
 
-    // Set socket timeout for better connection handling (only if enabled)
     if enable_timeouts {
         if let Err(e) = stream.set_read_timeout(Some(timeout)) {
             eprintln!("Failed to set read timeout: {}", e);
+            return;
         }
     }
 
-    let read_stream = stream.try_clone().expect("Failed to clone stream");
+    let read_stream = match stream.try_clone() {
+        Ok(stream) => stream,
+        Err(e) => {
+            eprintln!("Failed to clone stream: {}", e);
+            return;
+        }
+    };
     let mut write_stream = stream;
 
-    let welcome_msg = r#"Welcome to Medusa server!
-Commands:
-  SET key value [TTL seconds]  - Store a key-value pair with optional TTL
-  GET key                      - Retrieve value by key
-  DELETE key                   - Remove key-value pair
-  EXISTS key                   - Check if key exists
-  TTL key                      - Get time-to-live for key
-  EXPIRE key seconds           - Set expiration time for key
-  LIST                         - List all keys
-  KEYS pattern                 - Find keys matching pattern (use * for wildcard)
-  COUNT                        - Get number of entries
-  CLEAR                        - Remove all entries
-  FLUSHALL                     - Remove all entries (alias for CLEAR)
-  INFO                         - Get server statistics
-  PING                         - Server health check
-  QUIT/EXIT                    - Disconnect
+    let welcome_msg = "Medusa server ready\n";
 
-Hash Operations:
-  HSET key field value         - Set hash field to value
-  HGET key field               - Get hash field value
-  HGETALL key                  - Get all hash fields and values
-  HDEL key field               - Delete hash field
-  HEXISTS key field            - Check if hash field exists
-  HLEN key                     - Get hash length
-
-List Operations:
-  LPUSH key value              - Push value to left of list
-  RPUSH key value              - Push value to right of list
-  LPOP key                     - Pop value from left of list
-  RPOP key                     - Pop value from right of list
-  LLEN key                     - Get list length
-  LRANGE key start stop        - Get list range (supports negative indices)
-
-Examples:
-  SET user:1 "John Doe" 3600    # Set with 1 hour TTL
-  EXPIRE user:1 7200            # Set 2 hour expiration
-  KEYS user:*                   # Find all user keys
-  TTL user:1                    # Check remaining time
-  HSET user:1 name "John"       # Set hash field
-  HGET user:1 name             # Get hash field
-  LPUSH tasks "task1"          # Push to list
-  LRANGE tasks 0 -1            # Get all list items
-
-"#;
-
-    if let Err(e) = write_stream.write_all(welcome_msg.as_bytes()) {
-        eprintln!("Failed to send welcome message: {}", e);
-        return;
-    }
+    let _ = write_stream.write_all(welcome_msg.as_bytes());
+    let _ = write_stream.flush();
 
     let mut reader = BufReader::new(read_stream);
     let mut buffer = String::new();
@@ -75,33 +37,27 @@ Examples:
         buffer.clear();
 
         match reader.read_line(&mut buffer) {
-            Ok(0) => {
-                println!("Client disconnected");
-                break;
-            }
+            Ok(0) => break,
             Ok(_) => {
                 let message = buffer.trim();
-                println!("Received: {}", message);
+                if message.is_empty() {
+                    continue;
+                }
 
                 let response = process_command(message, &store);
 
-                if let Err(e) = write_stream.write_all(response.as_bytes()) {
-                    eprintln!("Failed to send response: {}", e);
+                if write_stream.write_all(response.as_bytes()).is_err() {
                     break;
                 }
+                let _ = write_stream.flush();
 
-                if message.to_lowercase() == "quit" || message.to_lowercase() == "exit" {
+                if matches!(message.to_lowercase().as_str(), "quit" | "exit") {
                     break;
                 }
             }
-            Err(e) => {
-                eprintln!("Error reading from client: {}", e);
-                break;
-            }
+            Err(_) => break,
         }
     }
-
-    println!("Client handler finished");
 }
 
 fn process_command(command: &str, store: &Store) -> String {
@@ -129,7 +85,6 @@ fn process_command(command: &str, store: &Store) -> String {
                         Err(e) => format!("ERROR: Failed to set value: {}\n", e),
                     }
                 } else {
-                    // No TTL provided, set normally
                     match store.set(key, &value) {
                         Ok(_) => format!("OK: Set '{}' = '{}'\n", key, value),
                         Err(e) => format!("ERROR: Failed to set value: {}\n", e),
