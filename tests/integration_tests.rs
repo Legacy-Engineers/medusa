@@ -1,10 +1,13 @@
-use std::io::{Read, Write};
+use std::io::{BufRead, BufReader, Write};
 use std::net::TcpStream;
+use std::sync::atomic::{AtomicU16, Ordering};
 use std::thread;
 use std::time::Duration;
 
+static PORT_COUNTER: AtomicU16 = AtomicU16::new(12312);
+
 fn start_test_server() -> u16 {
-    let port = 12312;
+    let port = PORT_COUNTER.fetch_add(1, Ordering::SeqCst);
     thread::spawn(move || {
         let config = medusa::server::ServerConfig {
             host: "127.0.0.1".to_string(),
@@ -15,7 +18,7 @@ fn start_test_server() -> u16 {
         };
         medusa::server::start_server_with_config(config);
     });
-    thread::sleep(Duration::from_millis(100));
+    thread::sleep(Duration::from_millis(200)); // Give more time for server to start
     port
 }
 
@@ -23,13 +26,19 @@ fn send_command(port: u16, command: &str) -> Result<String, Box<dyn std::error::
     let mut stream = TcpStream::connect(format!("127.0.0.1:{}", port))?;
     stream.set_read_timeout(Some(Duration::from_secs(2)))?;
     
+    let mut reader = BufReader::new(stream.try_clone()?);
+    
+    // Read welcome message
     let mut welcome = String::new();
-    stream.read_to_string(&mut welcome)?;
+    reader.read_line(&mut welcome)?;
     
+    // Send command
     stream.write_all(format!("{}\n", command).as_bytes())?;
+    stream.flush()?;
     
+    // Read response
     let mut response = String::new();
-    stream.read_to_string(&mut response)?;
+    reader.read_line(&mut response)?;
     
     Ok(response)
 }
@@ -85,11 +94,27 @@ fn test_pattern_matching() {
 fn test_connection_resilience() {
     let port = start_test_server();
     
-    let mut stream = TcpStream::connect(format!("127.0.0.1:{}", port)).unwrap();
-    stream.write_all(b"SET test value\n").unwrap();
+    // First connection - set a value and disconnect abruptly
+    {
+        let mut stream = TcpStream::connect(format!("127.0.0.1:{}", port)).unwrap();
+        let mut reader = BufReader::new(stream.try_clone().unwrap());
+        
+        // Read welcome message
+        let mut welcome = String::new();
+        reader.read_line(&mut welcome).unwrap();
+        
+        // Send command
+        stream.write_all(b"SET test value\n").unwrap();
+        stream.flush().unwrap();
+        
+        // Read response to ensure command was processed
+        let mut response = String::new();
+        reader.read_line(&mut response).unwrap();
+        
+        // Drop the connection
+    }
     
-    drop(stream);
-    
+    // Second connection - verify the data persisted
     let response = send_command(port, "GET test").unwrap();
     assert!(response.contains("value"));
 }
