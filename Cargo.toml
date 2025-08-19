@@ -9,6 +9,10 @@ repository = "https://github.com/Legacy-Engineers/medusa"
 keywords = ["redis", "key-value", "database", "learning", "rust"]
 categories = ["database", "command-line-utilities"]
 
+[lib]
+name = "medusa"
+path = "src/lib.rs"
+
 [dependencies]
 once_cell = "1.21.3"
 
