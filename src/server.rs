@@ -26,22 +26,29 @@ impl Default for ServerConfig {
 
 pub fn start_server_with_config(config: ServerConfig) {
     let address = format!("{}:{}", config.host, config.port);
-    
-    println!("⚡ Starting Medusa server...");
-    println!("📍 Address: {}", address);
-    println!("🔗 Max connections: {}", config.max_connections);
-    println!("⏱️  Timeouts: {}", if config.enable_timeouts { "Enabled" } else { "Disabled" });
+
+    println!("Starting Medusa server...");
+    println!("Address: {}", address);
+    println!("Max connections: {}", config.max_connections);
+    println!(
+        "Timeouts: {}",
+        if config.enable_timeouts {
+            "Enabled"
+        } else {
+            "Disabled"
+        }
+    );
     if config.enable_timeouts {
-        println!("⏱️  Connection timeout: {:?}", config.connection_timeout);
+        println!("Connection timeout: {:?}", config.connection_timeout);
     }
-    
+
     let listener = match TcpListener::bind(&address) {
         Ok(listener) => {
-            println!("✅ Server bound successfully to {}", address);
+            println!("Server bound successfully to {}", address);
             listener
         }
         Err(e) => {
-            eprintln!("❌ Failed to bind to {}: {}", address, e);
+            eprintln!("Failed to bind to {}: {}", address, e);
             return;
         }
     };
@@ -53,15 +60,18 @@ pub fn start_server_with_config(config: ServerConfig) {
     let store = Store::new();
     let mut connection_count = 0;
 
-    println!("🚀 Medusa server is ready! Waiting for connections...\n");
+    println!("Medusa server is ready! Waiting for connections...\n");
 
     for stream in listener.incoming() {
         match stream {
             Ok(stream) => {
                 connection_count += 1;
-                
+
                 if connection_count > config.max_connections {
-                    eprintln!("⚠️  Max connections reached ({}), rejecting new connection", config.max_connections);
+                    eprintln!(
+                        "⚠️  Max connections reached ({}), rejecting new connection",
+                        config.max_connections
+                    );
                     continue;
                 }
 
@@ -77,11 +87,22 @@ pub fn start_server_with_config(config: ServerConfig) {
                     Err(_) => "unknown".to_string(),
                 };
 
-                println!("🔌 New connection #{} from {}", connection_count, client_addr);
+                println!(
+                    "🔌 New connection #{} from {}",
+                    connection_count, client_addr
+                );
 
                 thread::spawn(move || {
-                    handle_client_with_timeout(stream, store_clone, config.enable_timeouts, config.connection_timeout);
-                    println!("🔌 Connection #{} from {} closed", connection_count, client_addr);
+                    handle_client_with_timeout(
+                        stream,
+                        store_clone,
+                        config.enable_timeouts,
+                        config.connection_timeout,
+                    );
+                    println!(
+                        "🔌 Connection #{} from {} closed",
+                        connection_count, client_addr
+                    );
                 });
             }
             Err(e) => {
@@ -118,7 +139,7 @@ mod tests {
     fn test_socket_configuration() {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         let addr = listener.local_addr().unwrap();
-        
+
         // Test client connection
         let client_stream = TcpStream::connect(addr).unwrap();
         let result = configure_client_socket(&client_stream, Duration::from_secs(10));

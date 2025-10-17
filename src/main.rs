@@ -1,10 +1,5 @@
-mod client_handler;
-mod config;
-mod server;
-mod store;
-
-use config::Config;
-use server::{start_server_with_config, ServerConfig};
+use medusa::config::Config;
+use medusa::server::{start_server_with_config, ServerConfig};
 
 fn main() {
     println!("⚡ Medusa - Lightning Fast Key-Value Store");

@@ -22,11 +22,11 @@ _A lightning-fast in-memory key-value store built with Rust_ ⚡
 
 ---
 
-## 🎯 About
+## About
 
 **Medusa** is a lightweight, high-performance in-memory key-value store inspired by [Redis](https://redis.io), built entirely in **Rust**. This project serves as a learning experiment to explore systems programming concepts and database internals.
 
-### 🧠 What You'll Learn
+### What You'll Learn
 
 - **Low-level data storage** and memory management
 - **TCP networking** and concurrent client handling
@@ -39,13 +39,13 @@ _A lightning-fast in-memory key-value store built with Rust_ ⚡
 
 ## ⚡ Why "Medusa"?
 
-Just as the mythical Medusa possessed incredible power, this project channels that energy into a compact, efficient data store. While it won't turn you to stone, it might transform your understanding of how databases work under the hood! 🧠⚙️
+Just as the mythical Medusa possessed incredible power, this project channels that energy into a compact, efficient data store. While it won't turn you to stone, it might transform your understanding of how databases work under the hood!
 
-## 🎯 Project Goals
+## Project Goals
 
 <div align="center">
 
-|         🎓 **Learning**         |    ⚡ **Performance**     |    🛠️ **Hands-on**    |
+|          **Learning**         |    ⚡ **Performance**     |     **Hands-on**    |
 | :-----------------------------: | :-----------------------: | :-------------------: |
 |   Explore database internals    | Fast in-memory operations |  Build from scratch   |
 | Master Rust systems programming |  Efficient TCP handling   | Understand every line |
@@ -53,9 +53,9 @@ Just as the mythical Medusa possessed incredible power, this project channels th
 
 </div>
 
-## 🚫 What This Is NOT
+## What This Is NOT
 
-> ⚠️ **Important**: This is **not** a production-ready Redis clone.
+> **Important**: This is **not** a production-ready Redis clone.
 
 **Missing Features:**
 
@@ -67,52 +67,52 @@ Just as the mythical Medusa possessed incredible power, this project channels th
 
 **Focus:** Understanding core concepts, not feature completeness.
 
-## 🆕 New Features
+## New Features
 
-### ⏱️ **TTL Support**
+### **TTL Support**
 
 - Set expiration times for keys
 - Automatic cleanup of expired keys
 - TTL querying and management
 
-### 🔍 **Pattern Matching**
+### **Pattern Matching**
 
 - Wildcard key searches (`KEYS user:*`)
 - Advanced pattern matching capabilities
 - Efficient key filtering
 
-### 🗂️ **Hash Data Type**
+### **Hash Data Type**
 
 - Store field-value pairs within a key
 - Operations: HSET, HGET, HGETALL, HDEL, HEXISTS, HLEN
 - Perfect for storing object-like data structures
 
-### 📋 **List Data Type**
+### **List Data Type**
 
 - Ordered collections of strings
 - Operations: LPUSH, RPUSH, LPOP, RPOP, LLEN, LRANGE
 - Support for negative indices in range operations
 - Ideal for queues, stacks, and ordered data
 
-### ⚙️ **Configuration System**
+### **Configuration System**
 
 - Environment variable support
 - Configurable timeouts and limits
 - Flexible server settings
 
-### 📊 **Benchmarking Tools**
+### **Benchmarking Tools**
 
 - Built-in performance testing
 - Multi-threaded benchmarks
 - Stress testing capabilities
 
-### 🛡️ **Enhanced Error Handling**
+### **Enhanced Error Handling**
 
 - Better connection management
 - Timeout support
 - Graceful error recovery
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 <div align="center">
 
@@ -125,12 +125,12 @@ Just as the mythical Medusa possessed incredible power, this project channels th
 
 </div>
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
 - [Rust](https://www.rust-lang.org/tools/install) (latest stable)
-- A terminal and some curiosity! 🧠
+- A terminal and some curiosity!
 
 ### Running Medusa
 
@@ -167,7 +167,7 @@ cargo run --bin medusa-benchmark
 cargo run --bin medusa-benchmark 127.0.0.1 2312 10000 8
 ```
 
-## 📚 Available Commands
+## Available Commands
 
 ### 🔧 **Basic Operations**
 
@@ -178,14 +178,14 @@ DELETE key                   # Remove key-value pair
 EXISTS key                   # Check if key exists
 ```
 
-### ⏱️ **TTL Management**
+### **TTL Management**
 
 ```bash
 TTL key                      # Get time-to-live for key
 EXPIRE key seconds           # Set expiration time for key
 ```
 
-### 🗂️ **Hash Operations**
+### **Hash Operations**
 
 ```bash
 HSET key field value         # Set hash field to value
@@ -196,7 +196,7 @@ HEXISTS key field            # Check if hash field exists
 HLEN key                     # Get hash length
 ```
 
-### 📋 **List Operations**
+### **List Operations**
 
 ```bash
 LPUSH key value              # Push value to left of list
@@ -207,7 +207,7 @@ LLEN key                     # Get list length
 LRANGE key start stop        # Get list range (supports negative indices)
 ```
 
-### 🔍 **Query Operations**
+### **Query Operations**
 
 ```bash
 LIST                         # List all keys
@@ -215,7 +215,7 @@ KEYS pattern                 # Find keys matching pattern (use * for wildcard)
 COUNT                        # Get number of entries
 ```
 
-### 🛠️ **Administrative**
+### **Administrative**
 
 ```bash
 CLEAR/FLUSHALL              # Remove all entries
@@ -224,7 +224,7 @@ PING                         # Server health check
 QUIT/EXIT                    # Disconnect
 ```
 
-### 💡 **Examples**
+### **Examples**
 
 ```bash
 SET user:1 "John Doe" 3600    # Set with 1 hour TTL
@@ -237,7 +237,7 @@ LPUSH tasks "task1"          # Push to list
 LRANGE tasks 0 -1            # Get all list items
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -261,22 +261,22 @@ The server supports various configuration options:
 - **Timeouts**: Configure connection timeouts (disabled by default)
 - **Logging**: Adjust verbosity levels
 
-## 📊 Performance
+## Performance
 
 ### Benchmark Results
 
 Typical performance on modern hardware:
 
 ```
-📊 Benchmark Results: Single-threaded SET
-  🔢 Operations: 10000
-  ⏱️  Duration: 1.2s
-  🚀 Ops/sec: 8333.33
-  ⚡ Avg Latency: 0.12ms
+Benchmark Results: Single-threaded SET
+  Operations: 10000
+  Duration: 1.2s
+  Ops/sec: 8333.33
+  Avg Latency: 0.12ms
 
-📊 Benchmark Results: Multi-threaded (4 threads)
-  🔢 Total Operations: 40000
-  🚀 Total Ops/sec: 25000.00
+Benchmark Results: Multi-threaded (4 threads)
+  Total Operations: 40000
+  Total Ops/sec: 25000.00
 ```
 
 ### Performance Features
@@ -286,7 +286,7 @@ Typical performance on modern hardware:
 - **Optimized TCP handling**
 - **Automatic expired key cleanup**
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run all tests
@@ -300,7 +300,7 @@ cargo test server
 cargo run --bin medusa-benchmark
 ```
 
-## 📚 Learning Resources
+## Learning Resources
 
 <div align="center">
 
@@ -313,16 +313,16 @@ cargo run --bin medusa-benchmark
 
 </div>
 
-## 🤝 Contributing
+## Contributing
 
 This is a **learning project**, but contributions that improve code quality, documentation, or educational value are welcome!
 
 ### Development Guidelines
 
-- 🧪 **Experiment freely** - This is for learning!
-- 📝 **Document your discoveries** - Share what you learn
-- 🐛 **Report issues** - Help improve the codebase
-- 💡 **Suggest improvements** - Better ways to teach concepts
+- **Experiment freely** - This is for learning!
+- **Document your discoveries** - Share what you learn
+- **Report issues** - Help improve the codebase
+- **Suggest improvements** - Better ways to teach concepts
 
 ### Code Style
 
@@ -331,7 +331,7 @@ This is a **learning project**, but contributions that improve code quality, doc
 - Update documentation
 - Use meaningful commit messages
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
@@ -341,6 +341,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ⚡ by curious minds for curious minds**
 
-_"The best way to learn is to build"_ 🚀
+_"The best way to learn is to build"_
 
 </div>
