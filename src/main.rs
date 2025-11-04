@@ -2,7 +2,7 @@ use medusa::config::Config;
 use medusa::server::{start_server_with_config, ServerConfig};
 
 fn main() {
-    println!("⚡ Medusa - Lightning Fast Key-Value Store");
+    println!("[:)] Medusa - Lightning Fast Key-Value Store");
     println!("Built with Rust for learning and experimentation\n");
 
     let config = Config::from_env();

@@ -54,7 +54,7 @@ pub fn start_server_with_config(config: ServerConfig) {
     };
 
     if let Err(e) = listener.set_nonblocking(false) {
-        eprintln!("⚠️  Warning: Could not set non-blocking mode: {}", e);
+        eprintln!("Warning: Could not set non-blocking mode: {}", e);
     }
 
     let store = Store::new();
@@ -69,7 +69,7 @@ pub fn start_server_with_config(config: ServerConfig) {
 
                 if connection_count > config.max_connections {
                     eprintln!(
-                        "⚠️  Max connections reached ({}), rejecting new connection",
+                        "Max connections reached ({}), rejecting new connection",
                         config.max_connections
                     );
                     continue;
@@ -87,10 +87,7 @@ pub fn start_server_with_config(config: ServerConfig) {
                     Err(_) => "unknown".to_string(),
                 };
 
-                println!(
-                    "🔌 New connection #{} from {}",
-                    connection_count, client_addr
-                );
+                println!(" New connection #{} from {}", connection_count, client_addr);
 
                 thread::spawn(move || {
                     handle_client_with_timeout(
@@ -100,7 +97,7 @@ pub fn start_server_with_config(config: ServerConfig) {
                         config.connection_timeout,
                     );
                     println!(
-                        "🔌 Connection #{} from {} closed",
+                        "Connection #{} from {} closed",
                         connection_count, client_addr
                     );
                 });

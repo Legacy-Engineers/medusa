@@ -10,18 +10,19 @@ fn main() -> io::Result<()> {
 
     let mut stream = match TcpStream::connect("127.0.0.1:2312") {
         Ok(stream) => {
-            println!("✅ Connected to Medusa server!");
+            println!("[+] Connected to Medusa server!");
             stream
         }
         Err(e) => {
-            eprintln!("❌ Failed to connect to server: {}", e);
-            eprintln!("💡 Make sure the Medusa server is running with: cargo run");
+            eprintln!("[❌] Failed to connect to server: {}", e);
+            eprintln!("[%] Make sure the Medusa server is running with: cargo run");
             return Err(e);
         }
     };
 
     // Set socket timeouts (configurable)
-    let enable_timeouts = std::env::var("MEDUSA_CLIENT_TIMEOUTS").unwrap_or_else(|_| "false".to_string()) == "true";
+    let enable_timeouts =
+        std::env::var("MEDUSA_CLIENT_TIMEOUTS").unwrap_or_else(|_| "false".to_string()) == "true";
     if enable_timeouts {
         stream.set_read_timeout(Some(Duration::from_secs(30)))?;
         stream.set_write_timeout(Some(Duration::from_secs(10)))?;
@@ -40,18 +41,18 @@ fn main() -> io::Result<()> {
             buffer.clear();
             match reader.read_line(&mut buffer) {
                 Ok(0) => {
-                    println!("\n🔌 Server disconnected");
+                    println!("\n Server disconnected");
                     break;
                 }
                 Ok(_) => {
                     let response = buffer.trim();
                     if !response.is_empty() {
-                        println!("📡 Server: {}", response);
+                        println!(" Server: {}", response);
                     }
                     io::stdout().flush().unwrap();
                 }
                 Err(e) => {
-                    eprintln!("\n❌ Error reading from server: {}", e);
+                    eprintln!("\n Error reading from server: {}", e);
                     break;
                 }
             }
@@ -61,14 +62,14 @@ fn main() -> io::Result<()> {
 
     // Main input loop
     let stdin = io::stdin();
-    println!("\n🎯 Type commands (or 'help' for available commands, 'quit' to exit):");
-    println!("💡 Example: SET user:1 'John Doe' 3600");
+    println!("\n Type commands (or 'help' for available commands, 'quit' to exit):");
+    println!(" Example: SET user:1 'John Doe' 3600");
 
     for line in stdin.lock().lines() {
         match line {
             Ok(input) => {
                 let trimmed = input.trim();
-                
+
                 if trimmed.is_empty() {
                     continue;
                 }
@@ -80,7 +81,7 @@ fn main() -> io::Result<()> {
                         continue;
                     }
                     "quit" | "exit" => {
-                        println!("👋 Goodbye!");
+                        println!("[!] Goodbye!");
                         break;
                     }
                     "clear" => {
@@ -102,7 +103,7 @@ fn main() -> io::Result<()> {
                 }
             }
             Err(e) => {
-                eprintln!("❌ Error reading input: {}", e);
+                eprintln!(" Error reading input: {}", e);
                 break;
             }
         }
@@ -110,12 +111,12 @@ fn main() -> io::Result<()> {
 
     // Wait for reader thread to finish
     let _ = rx.recv();
-    println!("🔌 Disconnected from server");
+    println!("[-] Disconnected from server");
     Ok(())
 }
 
 fn print_help() {
-    println!("\n📚 Available Commands:");
+    println!("\n[-] Available Commands:");
     println!("  SET key value [TTL]     - Store key-value pair with optional TTL");
     println!("  GET key                  - Retrieve value by key");
     println!("  DELETE key               - Remove key-value pair");
@@ -131,24 +132,24 @@ fn print_help() {
     println!("  QUIT/EXIT                - Disconnect");
     println!("  HELP                     - Show this help");
     println!("  CLEAR                    - Clear screen");
-    
-    println!("\n🗂️  Hash Operations:");
+
+    println!("\n[-]  Hash Operations:");
     println!("  HSET key field value     - Set hash field to value");
     println!("  HGET key field           - Get hash field value");
     println!("  HGETALL key              - Get all hash fields and values");
     println!("  HDEL key field           - Delete hash field");
     println!("  HEXISTS key field        - Check if hash field exists");
     println!("  HLEN key                 - Get hash length");
-    
-    println!("\n📋 List Operations:");
+
+    println!("\n[-] List Operations:");
     println!("  LPUSH key value          - Push value to left of list");
     println!("  RPUSH key value          - Push value to right of list");
     println!("  LPOP key                 - Pop value from left of list");
     println!("  RPOP key                 - Pop value from right of list");
     println!("  LLEN key                 - Get list length");
     println!("  LRANGE key start stop    - Get list range (supports negative indices)");
-    
-    println!("\n💡 Examples:");
+
+    println!("\n[-] Examples:");
     println!("  SET user:1 'John Doe' 3600    # Set with 1 hour TTL");
     println!("  EXPIRE user:1 7200            # Set 2 hour expiration");
     println!("  KEYS user:*                   # Find all user keys");
